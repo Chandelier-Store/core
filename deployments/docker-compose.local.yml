@@ -1,0 +1,20 @@
+networks:
+  monitoring:
+    driver: bridge
+
+services:
+  DB:
+    image: postgres:12.4-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: '14022004'
+      POSTGRES_DB: core
+    ports:
+      - '5432:5432'
+
+  DB-ADMINER:
+    image: dockette/adminer:full
+    restart: always
+    ports:
+      - '5051:80'
