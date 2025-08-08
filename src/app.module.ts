@@ -4,6 +4,7 @@ import { AppController } from './app.controller'
 import { AppService } from './app.service'
 import { StorageModule } from './storage/storage.module'
 import { FaqModule } from './faq/faq.module';
+import { CategoryModule } from './category/category.module';
 
 @Module({
 	imports: [
@@ -11,7 +12,8 @@ import { FaqModule } from './faq/faq.module';
 			isGlobal: true
 		}),
 		StorageModule,
-		FaqModule
+		FaqModule,
+		CategoryModule
 	],
 	controllers: [AppController],
 	providers: [AppService]

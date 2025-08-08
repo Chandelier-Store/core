@@ -1,6 +1,7 @@
 import {
 	Body,
 	Controller,
+	Delete,
 	Get,
 	HttpCode,
 	Param,
@@ -32,5 +33,12 @@ export class FaqController {
 	@Put(':id')
 	async update(@Param('id') id: string, @Body() dto: FaqDto) {
 		return this.faqService.update(id, dto)
+	}
+
+	@HttpCode(204)
+	// @Auth()
+	@Delete(':id')
+	async delete(@Param('id') id: string) {
+		return this.faqService.delete(id)
 	}
 }

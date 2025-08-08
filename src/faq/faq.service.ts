@@ -30,4 +30,9 @@ export class FaqService {
 			}
 		})
 	}
+	async delete(id: string) {
+		return this.prisma.faq.delete({
+			where: { id }
+		})
+	}
 }
