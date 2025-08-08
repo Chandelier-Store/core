@@ -5,6 +5,7 @@ networks:
 services:
   DB:
     image: postgres:12.4-alpine
+    container_name: postgres_db
     restart: always
     environment:
       POSTGRES_USER: postgres
@@ -15,6 +16,22 @@ services:
 
   DB-ADMINER:
     image: dockette/adminer:full
+    container_name: adminer_db
     restart: always
     ports:
       - '5051:80'
+
+  MINIO:
+    image: minio/minio:latest
+    container_name: minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minio_admin
+      MINIO_ROOT_PASSWORD: '14022004'
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - ./minio-data:/data
+    networks:
+      - monitoring
