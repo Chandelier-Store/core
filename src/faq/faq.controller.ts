@@ -10,6 +10,7 @@ import {
 	UsePipes,
 	ValidationPipe
 } from '@nestjs/common'
+import { Auth } from 'src/auth/decorators/auth.decorator'
 import { FaqDto } from './dto/faq.dto'
 import { FaqService } from './faq.service'
 
@@ -23,6 +24,7 @@ export class FaqController {
 
 	@UsePipes(new ValidationPipe())
 	@HttpCode(201)
+	@Auth()
 	@Post()
 	async create(@Body() dto: FaqDto) {
 		return this.faqService.create(dto)
@@ -30,13 +32,14 @@ export class FaqController {
 
 	@UsePipes(new ValidationPipe())
 	@HttpCode(200)
+	@Auth()
 	@Put(':id')
 	async update(@Param('id') id: string, @Body() dto: FaqDto) {
 		return this.faqService.update(id, dto)
 	}
 
 	@HttpCode(204)
-	// @Auth()
+	@Auth()
 	@Delete(':id')
 	async delete(@Param('id') id: string) {
 		return this.faqService.delete(id)

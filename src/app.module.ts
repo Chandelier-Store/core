@@ -5,6 +5,7 @@ import { AppService } from './app.service'
 import { StorageModule } from './storage/storage.module'
 import { FaqModule } from './faq/faq.module';
 import { CategoryModule } from './category/category.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
 	imports: [
@@ -13,7 +14,8 @@ import { CategoryModule } from './category/category.module';
 		}),
 		StorageModule,
 		FaqModule,
-		CategoryModule
+		CategoryModule,
+		AuthModule
 	],
 	controllers: [AppController],
 	providers: [AppService]
