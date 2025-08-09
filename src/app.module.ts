@@ -6,6 +6,7 @@ import { StorageModule } from './storage/storage.module'
 import { FaqModule } from './faq/faq.module';
 import { CategoryModule } from './category/category.module';
 import { AuthModule } from './auth/auth.module';
+import { ProductModule } from './product/product.module';
 
 @Module({
 	imports: [
@@ -15,7 +16,8 @@ import { AuthModule } from './auth/auth.module';
 		StorageModule,
 		FaqModule,
 		CategoryModule,
-		AuthModule
+		AuthModule,
+		ProductModule
 	],
 	controllers: [AppController],
 	providers: [AppService]

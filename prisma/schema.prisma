@@ -58,7 +58,7 @@ model ProductVariant {
   inStock    Int       @default(0) @map("in_stock")
   productId  String    @map("product_id")
 
-  product    Product   @relation(fields: [productId], references: [id])
+  product    Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
   cartItems  CartItem[] 
   orderItems OrderItem[]
 }

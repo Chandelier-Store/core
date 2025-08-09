@@ -1,0 +1,127 @@
+import { Injectable } from '@nestjs/common'
+import { Prisma } from '@prisma/client'
+import { PrismaService } from 'src/prisma.service'
+import { StorageService } from 'src/storage/storage.service'
+import { ProductDto } from './dto/product.dto'
+import { QueryDto } from './dto/query.dto'
+
+@Injectable()
+export class ProductService {
+	constructor(
+		private prisma: PrismaService,
+		private storageService: StorageService
+	) {}
+	async getList(query: QueryDto) {
+		const where: Prisma.ProductWhereInput = {
+			...(query.name && {
+				name: {
+					contains: query.name,
+					mode: Prisma.QueryMode.insensitive
+				}
+			}),
+			...(query.category && {
+				category: {
+					is: {
+						name: {
+							contains: query.category,
+							mode: Prisma.QueryMode.insensitive
+						}
+					}
+				}
+			})
+		}
+
+		const [items, count] = await this.prisma.$transaction([
+			this.prisma.product.findMany({
+				where,
+				include: {
+					category: true,
+					variants: true
+				},
+				orderBy: {
+					createdAt: 'desc'
+				},
+				take: query.limit ?? 20,
+				skip: query.offset ?? 0
+			}),
+			this.prisma.product.count({ where })
+		])
+
+		return {
+			data: items,
+			meta: {
+				count
+			}
+		}
+	}
+	async create(dto: ProductDto, image?: Express.Multer.File) {
+		let imageUrl: string | undefined
+		if (image) {
+			imageUrl = await this.storageService.uploadFile(
+				'images',
+				`products/${Date.now()}-${image.originalname}`,
+				image.buffer,
+				image.mimetype
+			)
+		}
+		return this.prisma.product.create({
+			data: {
+				name: dto.name,
+				description: dto.description,
+				...(imageUrl ? { image: imageUrl } : {}),
+				...(dto.categoryId ? { categoryId: dto.categoryId } : {}),
+				variants: {
+					create: dto.variants.map(variant => ({
+						size: variant.size,
+						price: variant.price,
+						inStock: variant.inStock
+					}))
+				}
+			},
+			include: {
+				category: true,
+				variants: true
+			}
+		})
+	}
+	async update(id: string, dto: ProductDto, image?: Express.Multer.File) {
+		let imageUrl: string | undefined
+		if (image) {
+			imageUrl = await this.storageService.uploadFile(
+				'images',
+				`products/${Date.now()}-${image.originalname}`,
+				image.buffer,
+				image.mimetype
+			)
+		}
+		await this.prisma.productVariant.deleteMany({
+			where: { productId: id }
+		})
+		const variantsCreate = dto.variants.map(variant => ({
+			size: variant.size,
+			price: variant.price,
+			inStock: variant.inStock
+		}))
+		return this.prisma.product.update({
+			where: { id },
+			data: {
+				name: dto.name,
+				description: dto.description,
+				...(imageUrl ? { image: imageUrl } : {}),
+				...(dto.categoryId ? { categoryId: dto.categoryId } : {}),
+				variants: {
+					create: variantsCreate
+				}
+			},
+			include: {
+				category: true,
+				variants: true
+			}
+		})
+	}
+	async delete(id: string) {
+		return this.prisma.product.delete({
+			where: { id }
+		})
+	}
+}
