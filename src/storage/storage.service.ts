@@ -33,7 +33,7 @@ export class StorageService {
 				ContentType: mimeType
 			})
 		)
-		return `${process.env.MINIO_HOST}:${process.env.MINIO_PORT}/${bucket}/${fileName}`
+		return `${process.env.MINIO_API}/${bucket}/${fileName}`
 	}
 	async deleteFile(bucket: string, fileName: string) {
 		try {

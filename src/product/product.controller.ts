@@ -28,14 +28,14 @@ export class ProductController {
 		return this.productService.getList(query)
 	}
 
-	@Post()
+	@UsePipes(new ValidationPipe())
 	@HttpCode(201)
 	@Auth()
 	@UseInterceptors(FileInterceptor('image'))
-	@UsePipes(new ValidationPipe())
+	@Post()
 	async create(
 		@Body() dto: ProductDto,
-		@UploadedFile() image?: Express.Multer.File
+		@UploadedFile() image: Express.Multer.File
 	) {
 		return this.productService.create(dto, image)
 	}
@@ -48,7 +48,7 @@ export class ProductController {
 	async update(
 		@Param('id') id: string,
 		@Body() dto: ProductDto,
-		@UploadedFile() image?: Express.Multer.File
+		@UploadedFile() image: Express.Multer.File
 	) {
 		return this.productService.update(id, dto, image)
 	}

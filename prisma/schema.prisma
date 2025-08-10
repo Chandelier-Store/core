@@ -55,7 +55,7 @@ model ProductVariant {
   updatedAt  DateTime  @updatedAt @map("updated_at")
   size       String
   price      Float
-  inStock    Int       @default(0) @map("in_stock")
+  inStock    Boolean   @default(false) @map("in_stock")
   productId  String    @map("product_id")
 
   product    Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
@@ -68,6 +68,7 @@ model Category {
   createdAt  DateTime  @default(now()) @map("created_at")
   updatedAt  DateTime  @updatedAt @map("updated_at")
   name       String    @unique
+  image      String    @default("images/default/default_category.png") @map("image_url")
 
   products   Product[]
 }

@@ -1,12 +1,10 @@
 import { ConfigService } from '@nestjs/config'
 
 export const getStorageConfig = (configService: ConfigService) => {
-	const isSSL = configService.get<string>('MINIO_USE_SSL') === 'true'
-	const protocol = isSSL ? 'https' : 'http'
 
 	return {
 		region: configService.get<string>('MINIO_REGION') || 'us-east-1',
-		endpoint: `${protocol}://${configService.get<string>('MINIO_HOST')}:${configService.get<string>('MINIO_PORT')}`,
+		endpoint: configService.get<string>('MINIO_API'),
 		forcePathStyle: true,
 		credentials: {
 			accessKeyId:
@@ -14,6 +12,6 @@ export const getStorageConfig = (configService: ConfigService) => {
 			secretAccessKey:
 				configService.get<string>('MINIO_SECRET_KEY') || '14022004'
 		},
-		publicUrlBase: `${configService.get<string>('MINIO_HOST')}:${configService.get<string>('MINIO_PORT')}`
+		publicUrlBase: `${configService.get<string>('MINIO_API')}/${configService.get<string>('MINIO_BUCKET')}`
 	}
 }

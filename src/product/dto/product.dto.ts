@@ -1,5 +1,11 @@
 import { Type } from 'class-transformer'
-import { IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator'
+import {
+	IsBoolean,
+	IsNumber,
+	IsOptional,
+	IsString,
+	ValidateNested
+} from 'class-validator'
 
 class ProductVariantDto {
 	id?: string
@@ -11,9 +17,9 @@ class ProductVariantDto {
 	@IsNumber()
 	price: number
 
-	@Type(() => Number)
-	@IsNumber()
-	inStock: number
+	@Type(() => Boolean)
+	@IsBoolean()
+	inStock: boolean
 }
 
 export class ProductDto {
@@ -24,10 +30,11 @@ export class ProductDto {
 	description: string
 
 	@IsOptional()
-	@IsString({ each: true })
+	@IsString()
 	image?: string
 
 	@IsOptional()
+	@IsString()
 	categoryId?: string
 
 	@ValidateNested({ each: true })

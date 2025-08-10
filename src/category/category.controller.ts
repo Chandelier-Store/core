@@ -7,9 +7,12 @@ import {
 	Param,
 	Post,
 	Put,
+	UploadedFile,
+	UseInterceptors,
 	UsePipes,
 	ValidationPipe
 } from '@nestjs/common'
+import { FileInterceptor } from '@nestjs/platform-express'
 import { Auth } from 'src/auth/decorators/auth.decorator'
 import { CategoryService } from './category.service'
 import { CategoryDto } from './dto/category.dto'
@@ -26,17 +29,26 @@ export class CategoryController {
 	@UsePipes(new ValidationPipe())
 	@HttpCode(201)
 	@Auth()
+	@UseInterceptors(FileInterceptor('image'))
 	@Post()
-	async create(@Body() dto: CategoryDto) {
-		return this.categoryService.create(dto)
+	async create(
+		@Body() dto: CategoryDto,
+		@UploadedFile() image: Express.Multer.File
+	) {
+		return this.categoryService.create(dto, image)
 	}
 
 	@UsePipes(new ValidationPipe())
 	@HttpCode(200)
 	@Auth()
+	@UseInterceptors(FileInterceptor('image'))
 	@Put(':id')
-	async update(@Param('id') id: string, @Body() dto: CategoryDto) {
-		return this.categoryService.update(id, dto)
+	async update(
+		@Param('id') id: string,
+		@Body() dto: CategoryDto,
+		@UploadedFile() image: Express.Multer.File
+	) {
+		return this.categoryService.update(id, dto, image)
 	}
 
 	@HttpCode(204)

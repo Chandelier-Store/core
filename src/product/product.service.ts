@@ -54,7 +54,7 @@ export class ProductService {
 			}
 		}
 	}
-	async create(dto: ProductDto, image?: Express.Multer.File) {
+	async create(dto: ProductDto, image: Express.Multer.File) {
 		let imageUrl: string | undefined
 		if (image) {
 			imageUrl = await this.storageService.uploadFile(
@@ -64,12 +64,16 @@ export class ProductService {
 				image.mimetype
 			)
 		}
+		const categoryId =
+			dto.categoryId && dto.categoryId !== 'undefined'
+				? dto.categoryId
+				: undefined
 		return this.prisma.product.create({
 			data: {
 				name: dto.name,
 				description: dto.description,
 				...(imageUrl ? { image: imageUrl } : {}),
-				...(dto.categoryId ? { categoryId: dto.categoryId } : {}),
+				...(categoryId ? { categoryId } : {}),
 				variants: {
 					create: dto.variants.map(variant => ({
 						size: variant.size,
@@ -79,17 +83,16 @@ export class ProductService {
 				}
 			},
 			include: {
-				category: true,
 				variants: true
 			}
 		})
 	}
-	async update(id: string, dto: ProductDto, image?: Express.Multer.File) {
+	async update(id: string, dto: ProductDto, image: Express.Multer.File) {
 		let imageUrl: string | undefined
 		if (image) {
 			imageUrl = await this.storageService.uploadFile(
 				'images',
-				`products/${Date.now()}-${image.originalname}`,
+				`product/${Date.now()}-${image.originalname}`,
 				image.buffer,
 				image.mimetype
 			)
