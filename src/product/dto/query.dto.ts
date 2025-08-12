@@ -4,11 +4,7 @@ import { IsInt, IsOptional, IsString, Min } from 'class-validator'
 export class QueryDto {
 	@IsOptional()
 	@IsString()
-	name?: string
-
-	@IsOptional()
-	@IsString()
-	category?: string
+	search?: string
 
 	@IsOptional()
 	@Type(() => Number)

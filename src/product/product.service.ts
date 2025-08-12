@@ -13,22 +13,12 @@ export class ProductService {
 	) {}
 	async getList(query: QueryDto) {
 		const where: Prisma.ProductWhereInput = {
-			...(query.name && {
+			...(query.search && {
 				name: {
-					contains: query.name,
+					contains: query.search,
 					mode: Prisma.QueryMode.insensitive
 				}
 			}),
-			...(query.category && {
-				category: {
-					is: {
-						name: {
-							contains: query.category,
-							mode: Prisma.QueryMode.insensitive
-						}
-					}
-				}
-			})
 		}
 
 		const [items, count] = await this.prisma.$transaction([
