@@ -1,0 +1,11 @@
+import { Prisma } from '@prisma/client'
+
+export const returnUserObject: Prisma.UserSelect = {
+	id: true,
+	createdAt: true,
+	email: true,
+	name: true,
+	password: false,
+	phone: true,
+	role: true
+}
