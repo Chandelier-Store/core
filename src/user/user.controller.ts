@@ -5,6 +5,7 @@ import {
 	Get,
 	HttpCode,
 	Param,
+	Post,
 	Put,
 	UsePipes,
 	ValidationPipe
@@ -36,6 +37,16 @@ export class UserController {
 		@CurrentUser() currentUser
 	) {
 		return this.userService.update(id, data, currentUser)
+	}
+
+	@HttpCode(201)
+	@Auth()
+	@Post()
+	async create(
+		@Body() data: UserDto,
+		@CurrentUser() currentUser
+	) {
+		return this.userService.create(data, currentUser)
 	}
 
 	@UsePipes(new ValidationPipe({ whitelist: true }))
