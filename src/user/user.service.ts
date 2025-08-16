@@ -24,48 +24,48 @@ export class UserService {
 			where: { id }
 		})
 	}
-	async create(data: UserDto, currentUser: { id: string; role: Role }) {
+	async create(dto: UserDto, currentUser: { id: string; role: Role }) {
 		this.checkPermission(currentUser)
 		const existingUser = await this.prisma.user.findUnique({
-			where: { email: data.email }
+			where: { email: dto.email }
 		})
 		if (existingUser) {
 			throw new BadRequestException('User with this email already exists')
 		}
 		return this.prisma.user.create({
 			data: {
-				email: data.email,
-				password: await hash(data.password),
-				name: data.name,
-				phone: data.phone,
-				role: data.role ? (data.role as Role) : undefined
+				email: dto.email,
+				password: await hash(dto.password),
+				name: dto.name,
+				phone: dto.phone,
+				role: dto.role ? (dto.role as Role) : undefined
 			}
 		})
 	}
 	async update(
 		id: string,
-		data: UserDto,
+		dto: UserDto,
 		currentUser: { id: string; role: Role }
 	) {
 		this.checkPermission(currentUser)
 		const existingUser = await this.prisma.user.findUnique({
-			where: { email: data.email }
+			where: { email: dto.email }
 		})
 		if (existingUser && existingUser.id !== id) {
 			throw new BadRequestException('User with this email already exists')
 		}
 		let hashedPassword: string | undefined
-		if (data.password) {
-			hashedPassword = await hash(data.password)
+		if (dto.password) {
+			hashedPassword = await hash(dto.password)
 		}
 		return this.prisma.user.update({
 			where: { id },
 			data: {
-				email: data.email,
+				email: dto.email,
 				password: hashedPassword,
-				name: data.name,
-				phone: data.phone,
-				role: data.role ? { set: data.role as Role } : undefined
+				name: dto.name,
+				phone: dto.phone,
+				role: dto.role ? { set: dto.role as Role } : undefined
 			}
 		})
 	}
