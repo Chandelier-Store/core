@@ -8,12 +8,12 @@ import {
 	Post,
 	Put,
 	Query,
-	UploadedFile,
+	UploadedFiles,
 	UseInterceptors,
 	UsePipes,
 	ValidationPipe
 } from '@nestjs/common'
-import { FileInterceptor } from '@nestjs/platform-express'
+import { FileFieldsInterceptor } from '@nestjs/platform-express'
 import { Auth } from 'src/auth/decorators/auth.decorator'
 import { ProductDto } from './dto/product.dto'
 import { QueryDto } from './dto/query.dto'
@@ -31,32 +31,48 @@ export class ProductController {
 	@UsePipes(new ValidationPipe())
 	@HttpCode(201)
 	@Auth()
-	@UseInterceptors(FileInterceptor('image'))
+	@UseInterceptors(
+		FileFieldsInterceptor([
+			{ name: 'image', maxCount: 1 },
+			{ name: 'preview', maxCount: 1 }
+		])
+	)
 	@Post()
 	async create(
 		@Body() dto: ProductDto,
-		@UploadedFile() image: Express.Multer.File
+		@UploadedFiles()
+		files: { image?: Express.Multer.File[]; preview?: Express.Multer.File[] }
 	) {
-		return this.productService.create(dto, image)
+		const image = files.image?.[0]
+		const preview = files.preview?.[0]
+		return this.productService.create(dto, image, preview)
 	}
 
 	@Put(':id')
-  @HttpCode(200)
+	@HttpCode(200)
 	@Auth()
-	@UseInterceptors(FileInterceptor('image'))
+	@UseInterceptors(
+		FileFieldsInterceptor([
+			{ name: 'image', maxCount: 1 },
+			{ name: 'preview', maxCount: 1 }
+		])
+	)
 	@UsePipes(new ValidationPipe())
 	async update(
 		@Param('id') id: string,
 		@Body() dto: ProductDto,
-		@UploadedFile() image: Express.Multer.File
+		@UploadedFiles()
+		files: { image?: Express.Multer.File[]; preview?: Express.Multer.File[] }
 	) {
-		return this.productService.update(id, dto, image)
+		const image = files.image?.[0]
+		const preview = files.preview?.[0]
+		return this.productService.update(id, dto, image, preview)
 	}
 
-  @Delete(':id')
-  @HttpCode(204)
-  @Auth()
-  async delete(@Param('id') id: string) {
-    return this.productService.delete(id)
-  }
+	@Delete(':id')
+	@HttpCode(204)
+	@Auth()
+	async delete(@Param('id') id: string) {
+		return this.productService.delete(id)
+	}
 }

@@ -35,6 +35,10 @@ export class ProductDto {
 
 	@IsOptional()
 	@IsString()
+	preview?: string
+
+	@IsOptional()
+	@IsString()
 	categoryId?: string
 
 	@ValidateNested({ each: true })

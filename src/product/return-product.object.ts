@@ -4,12 +4,13 @@ export const returnProductObject: Prisma.ProductSelect = {
 	id: true,
 	createdAt: true,
 	image: true,
+	preview: true,
 	name: true,
 	description: true,
 	category: {
-		select: { 
-			id: true, 
-			name: true 
+		select: {
+			id: true,
+			name: true
 		}
 	},
 	variants: {

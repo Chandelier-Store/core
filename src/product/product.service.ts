@@ -18,7 +18,7 @@ export class ProductService {
 					contains: query.search,
 					mode: Prisma.QueryMode.insensitive
 				}
-			}),
+			})
 		}
 
 		const [items, count] = await this.prisma.$transaction([
@@ -44,14 +44,27 @@ export class ProductService {
 			}
 		}
 	}
-	async create(dto: ProductDto, image: Express.Multer.File) {
+	async create(
+		dto: ProductDto,
+		image?: Express.Multer.File,
+		preview?: Express.Multer.File
+	) {
 		let imageUrl: string | undefined
+		let previewUrl: string | undefined
 		if (image) {
 			imageUrl = await this.storageService.uploadFile(
 				'images',
 				`products/${Date.now()}-${image.originalname}`,
 				image.buffer,
 				image.mimetype
+			)
+		}
+		if (preview) {
+			previewUrl = await this.storageService.uploadFile(
+				'images',
+				`products/${Date.now()}-${preview.originalname}`,
+				preview.buffer,
+				preview.mimetype
 			)
 		}
 		const categoryId =
@@ -63,6 +76,7 @@ export class ProductService {
 				name: dto.name,
 				description: dto.description,
 				...(imageUrl ? { image: imageUrl } : {}),
+				...(previewUrl ? { preview: previewUrl } : {}),
 				...(categoryId ? { categoryId } : {}),
 				variants: {
 					create: dto.variants.map(variant => ({
@@ -77,14 +91,28 @@ export class ProductService {
 			}
 		})
 	}
-	async update(id: string, dto: ProductDto, image: Express.Multer.File) {
+	async update(
+		id: string,
+		dto: ProductDto,
+		image?: Express.Multer.File,
+		preview?: Express.Multer.File
+	) {
 		let imageUrl: string | undefined
+		let previewUrl: string | undefined
 		if (image) {
 			imageUrl = await this.storageService.uploadFile(
 				'images',
 				`product/${Date.now()}-${image.originalname}`,
 				image.buffer,
 				image.mimetype
+			)
+		}
+		if (preview) {
+			previewUrl = await this.storageService.uploadFile(
+				'images',
+				`product/${Date.now()}-${preview.originalname}`,
+				preview.buffer,
+				preview.mimetype
 			)
 		}
 		await this.prisma.productVariant.deleteMany({
@@ -101,6 +129,7 @@ export class ProductService {
 				name: dto.name,
 				description: dto.description,
 				...(imageUrl ? { image: imageUrl } : {}),
+				...(previewUrl ? { preview: previewUrl } : {}),
 				...(dto.categoryId ? { categoryId: dto.categoryId } : {}),
 				variants: {
 					create: variantsCreate

@@ -42,7 +42,9 @@ model Product {
   updatedAt   DateTime          @updatedAt @map("updated_at")
   name        String            @unique
   description String
-  image       String            @default("images/default/default_product.png") @map("image_url")
+  image       String            @default("images/default/default_product.jpg") @map("image_url")
+  preview     String            @default("images/default/default_preview.jpg") @map("preview_url")
+
   categoryId  String?           @map("category_id")
 
   category    Category?         @relation(fields: [categoryId], references: [id])
