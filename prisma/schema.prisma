@@ -37,18 +37,19 @@ model Faq {
 }
 
 model Product {
-  id          String            @id @default(uuid())
-  createdAt   DateTime          @default(now()) @map("created_at")
-  updatedAt   DateTime          @updatedAt @map("updated_at")
-  name        String            @unique
-  description String
-  image       String            @default("images/default/default_product.jpg") @map("image_url")
-  preview     String            @default("images/default/default_preview.jpg") @map("preview_url")
+  id           String            @id @default(uuid())
+  createdAt    DateTime          @default(now()) @map("created_at")
+  updatedAt    DateTime          @updatedAt @map("updated_at")
+  lastPickedAt DateTime?         @map("last_picked_at")
+  name         String            @unique
+  description  String
+  image        String            @default("images/default/default_product.jpg") @map("image_url")
+  preview      String            @default("images/default/default_preview.jpg") @map("preview_url")
 
-  categoryId  String?           @map("category_id")
+  categoryId   String?           @map("category_id")
 
-  category    Category?         @relation(fields: [categoryId], references: [id])
-  variants    ProductVariant[]
+  category     Category?         @relation(fields: [categoryId], references: [id])
+  variants     ProductVariant[]
 }
 
 model ProductVariant {

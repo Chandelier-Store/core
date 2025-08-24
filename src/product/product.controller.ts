@@ -75,4 +75,9 @@ export class ProductController {
 	async delete(@Param('id') id: string) {
 		return this.productService.delete(id)
 	}
+
+	@Get('today-product')
+	async getTodayProduct() {
+		return this.productService.getTodayProduct()
+	}
 }

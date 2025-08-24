@@ -146,4 +146,36 @@ export class ProductService {
 			where: { id }
 		})
 	}
+	async getTodayProduct() {
+		const todayStr = new Date().toISOString().split('T')[0]
+		const today = new Date(todayStr)
+
+		const picked = await this.prisma.product.findFirst({
+			where: { lastPickedAt: { gte: today } },
+			include: { category: true, variants: true }
+		})
+		if (picked) return picked
+		return this.pickNewProduct(today)
+	}
+	async pickNewProduct(today: Date) {
+		const allProducts = await this.prisma.product.findMany()
+		const unusedToday = allProducts.filter(p => {
+			return !p.lastPickedAt || p.lastPickedAt < today
+		})
+
+		const productToPick =
+			unusedToday.length > 0
+				? unusedToday[Math.floor(Math.random() * unusedToday.length)]
+				: allProducts.sort(
+						(a, b) =>
+							(a.lastPickedAt?.getTime() ?? 0) -
+							(b.lastPickedAt?.getTime() ?? 0)
+					)[0]
+
+		return this.prisma.product.update({
+			where: { id: productToPick.id },
+			data: { lastPickedAt: new Date() },
+			include: { category: true, variants: true }
+		})
+	}
 }
