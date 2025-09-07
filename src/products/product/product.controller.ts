@@ -76,8 +76,8 @@ export class ProductController {
 		return this.productService.delete(id)
 	}
 
-	@Get('today-product')
-	async getTodayProduct() {
-		return this.productService.getTodayProduct()
+	@Get('week-products')
+	async getWeekProducts() {
+		return this.productService.getWeekProducts()
 	}
 }

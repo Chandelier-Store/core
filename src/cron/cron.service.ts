@@ -8,9 +8,10 @@ export class CronService {
 	@Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT, {
 		timeZone: 'Asia/Dushanbe'
 	})
-	async handleProductOfTheDay() {
-		const todayStr = new Date().toISOString().split('T')[0]
-		const today = new Date(todayStr)
-		await this.productService.pickNewProduct(today)
+	async handleProductOfTheWeek() {
+		const weekStart = new Date()
+		weekStart.setHours(0, 0, 0, 0)
+		weekStart.setDate(weekStart.getDate() - weekStart.getDay())
+		await this.productService.pickNewWeekProducts([], 5, weekStart)
 	}
 }

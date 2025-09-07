@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common'
-import { Prisma } from '@prisma/client'
+import { Prisma, Product } from '@prisma/client'
 import { PrismaService } from 'src/prisma.service'
 import { StorageService } from 'src/storage/storage.service'
 import { ProductDto } from './dto/product.dto'
@@ -146,36 +146,43 @@ export class ProductService {
 			where: { id }
 		})
 	}
-	async getTodayProduct() {
-		const todayStr = new Date().toISOString().split('T')[0]
-		const today = new Date(todayStr)
+	async getWeekProducts(limit = 5) {
+		const weekStart = new Date()
+		weekStart.setHours(0, 0, 0, 0)
+		weekStart.setDate(weekStart.getDate() - weekStart.getDay())
 
-		const picked = await this.prisma.product.findFirst({
-			where: { lastPickedAt: { gte: today } },
+		const picked = await this.prisma.product.findMany({
+			where: { lastPickedAt: { gte: weekStart } },
 			include: { category: true, variants: true }
 		})
-		if (picked) return picked
-		return this.pickNewProduct(today)
+		if (picked.length >= limit) return picked
+		return this.pickNewWeekProducts(picked, limit, weekStart)
 	}
-	async pickNewProduct(today: Date) {
+	async pickNewWeekProducts(
+		existing: Product[],
+		limit: number,
+		weekStart: Date
+	) {
 		const allProducts = await this.prisma.product.findMany()
-		const unusedToday = allProducts.filter(p => {
-			return !p.lastPickedAt || p.lastPickedAt < today
-		})
+		const unused = allProducts.filter(
+			p => !p.lastPickedAt || p.lastPickedAt < weekStart
+		)
+		const toPick: Product[] = []
 
-		const productToPick =
-			unusedToday.length > 0
-				? unusedToday[Math.floor(Math.random() * unusedToday.length)]
-				: allProducts.sort(
-						(a, b) =>
-							(a.lastPickedAt?.getTime() ?? 0) -
-							(b.lastPickedAt?.getTime() ?? 0)
-					)[0]
-
-		return this.prisma.product.update({
-			where: { id: productToPick.id },
-			data: { lastPickedAt: new Date() },
-			include: { category: true, variants: true }
-		})
+		while (toPick.length + existing.length < limit) {
+			if (unused.length === 0) break
+			const index = Math.floor(Math.random() * unused.length)
+			toPick.push(unused.splice(index, 1)[0])
+		}
+		const updated = await Promise.all(
+			toPick.map(p =>
+				this.prisma.product.update({
+					where: { id: p.id },
+					data: { lastPickedAt: new Date() },
+					include: { category: true, variants: true }
+				})
+			)
+		)
+		return [...existing, ...updated]
 	}
 }
