@@ -102,7 +102,7 @@ export class ProductService {
 		if (image) {
 			imageUrl = await this.storageService.uploadFile(
 				'images',
-				`product/${Date.now()}-${image.originalname}`,
+				`products/${Date.now()}-${image.originalname}`,
 				image.buffer,
 				image.mimetype
 			)
@@ -110,7 +110,7 @@ export class ProductService {
 		if (preview) {
 			previewUrl = await this.storageService.uploadFile(
 				'images',
-				`product/${Date.now()}-${preview.originalname}`,
+				`products/${Date.now()}-${preview.originalname}`,
 				preview.buffer,
 				preview.mimetype
 			)

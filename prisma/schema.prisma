@@ -36,6 +36,15 @@ model Faq {
   answer     String
 }
 
+model Banner {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  image     String   @default("images/default/default_banner.jpg") @map("image_url")
+  link      String
+  isActive  Boolean  @default(true) @map("is_active")
+}
+
 model Product {
   id           String            @id @default(uuid())
   createdAt    DateTime          @default(now()) @map("created_at")

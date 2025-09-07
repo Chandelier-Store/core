@@ -1,59 +1,61 @@
 import { Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/prisma.service'
 import { StorageService } from 'src/storage/storage.service'
-import { CategoryDto } from './dto/category.dto'
+import { BannerDto } from './dto/banner.dto'
 
 @Injectable()
-export class CategoryService {
+export class BannerService {
 	constructor(
 		private prisma: PrismaService,
 		private storageService: StorageService
 	) {}
 	async getList() {
-		const items = await this.prisma.category.findMany()
-		const count = await this.prisma.category.count()
+		const items = await this.prisma.banner.findMany()
+		const count = await this.prisma.banner.count()
 		return {
 			data: items,
 			meta: { count }
 		}
 	}
-	async create(dto: CategoryDto, image: Express.Multer.File) {
+	async create(dto: BannerDto, image: Express.Multer.File) {
 		let imageUrl: string | undefined
 		if (image) {
 			imageUrl = await this.storageService.uploadFile(
 				'images',
-				`products/${Date.now()}-${image.originalname}`,
+				`content/${Date.now()}-${image.originalname}`,
 				image.buffer,
 				image.mimetype
 			)
 		}
-		return this.prisma.category.create({
+		return this.prisma.banner.create({
 			data: {
-				name: dto.name,
+				link: dto.link,
+        isActive: dto.isActive,
 				...(imageUrl ? { image: imageUrl } : {})
 			}
 		})
 	}
-	async update(id: string, dto: CategoryDto, image: Express.Multer.File) {
+	async update(id: string, dto: BannerDto, image: Express.Multer.File) {
 		let imageUrl: string | undefined
 		if (image) {
 			imageUrl = await this.storageService.uploadFile(
 				'images',
-				`products/${Date.now()}-${image.originalname}`,
+				`content/${Date.now()}-${image.originalname}`,
 				image.buffer,
 				image.mimetype
 			)
 		}
-		return this.prisma.category.update({
+		return this.prisma.banner.update({
 			where: { id },
 			data: {
-				name: dto.name,
+				link: dto.link,
+        isActive: dto.isActive,
 				...(imageUrl ? { image: imageUrl } : {})
 			}
 		})
 	}
 	async delete(id: string) {
-		return this.prisma.category.delete({
+		return this.prisma.banner.delete({
 			where: { id }
 		})
 	}
