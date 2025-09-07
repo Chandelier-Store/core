@@ -10,8 +10,8 @@ import {
 	UsePipes,
 	ValidationPipe
 } from '@nestjs/common'
-import { Auth } from 'src/auth/decorators/auth.decorator'
-import { CurrentUser } from 'src/auth/decorators/user.decorator'
+import { Auth } from 'src/account/auth/decorators/auth.decorator'
+import { CurrentUser } from 'src/account/auth/decorators/user.decorator'
 import { UserDto } from './dto/user.dto'
 import { UserService } from './user.service'
 
@@ -42,10 +42,7 @@ export class UserController {
 	@HttpCode(201)
 	@Auth()
 	@Post()
-	async create(
-		@Body() data: UserDto,
-		@CurrentUser() currentUser
-	) {
+	async create(@Body() data: UserDto, @CurrentUser() currentUser) {
 		return this.userService.create(data, currentUser)
 	}
 

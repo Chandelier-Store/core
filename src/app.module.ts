@@ -1,15 +1,13 @@
 import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
 import { ScheduleModule } from '@nestjs/schedule'
+import { AccountModule } from './account/account.module'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
-import { AuthModule } from './auth/auth.module'
-import { CategoryModule } from './category/category.module'
-import { FaqModule } from './faq/faq.module'
-import { ProductModule } from './product/product.module'
+import { ContentModule } from './content/content.module'
+import { CronModule } from './cron/cron.module'
+import { ProductsModule } from './products/products.module'
 import { StorageModule } from './storage/storage.module'
-import { UserModule } from './user/user.module'
-import { CronModule } from './cron/cron.module';
 
 @Module({
 	imports: [
@@ -18,12 +16,10 @@ import { CronModule } from './cron/cron.module';
 		}),
 		ScheduleModule.forRoot(),
 		StorageModule,
-		FaqModule,
-		CategoryModule,
-		AuthModule,
-		ProductModule,
-		UserModule,
-		CronModule
+		CronModule,
+		AccountModule,
+		ContentModule,
+		ProductsModule
 	],
 	controllers: [AppController],
 	providers: [AppService]

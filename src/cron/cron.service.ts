@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { Cron, CronExpression } from '@nestjs/schedule'
-import { ProductService } from 'src/product/product.service'
+import { ProductService } from 'src/products/product/product.service'
 
 @Injectable()
 export class CronService {
@@ -9,7 +9,7 @@ export class CronService {
 		timeZone: 'Asia/Dushanbe'
 	})
 	async handleProductOfTheDay() {
-    const todayStr = new Date().toISOString().split('T')[0]
+		const todayStr = new Date().toISOString().split('T')[0]
 		const today = new Date(todayStr)
 		await this.productService.pickNewProduct(today)
 	}

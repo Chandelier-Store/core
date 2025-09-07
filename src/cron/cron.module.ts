@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common'
-import { ProductModule } from 'src/product/product.module'
+import { ProductModule } from 'src/products/product/product.module'
 import { CronService } from './cron.service'
 
 @Module({

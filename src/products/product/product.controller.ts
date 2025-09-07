@@ -14,7 +14,7 @@ import {
 	ValidationPipe
 } from '@nestjs/common'
 import { FileFieldsInterceptor } from '@nestjs/platform-express'
-import { Auth } from 'src/auth/decorators/auth.decorator'
+import { Auth } from 'src/account/auth/decorators/auth.decorator'
 import { ProductDto } from './dto/product.dto'
 import { QueryDto } from './dto/query.dto'
 import { ProductService } from './product.service'

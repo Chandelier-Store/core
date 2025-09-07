@@ -13,7 +13,7 @@ import {
 	ValidationPipe
 } from '@nestjs/common'
 import { FileInterceptor } from '@nestjs/platform-express'
-import { Auth } from 'src/auth/decorators/auth.decorator'
+import { Auth } from 'src/account/auth/decorators/auth.decorator'
 import { CategoryService } from './category.service'
 import { CategoryDto } from './dto/category.dto'
 
