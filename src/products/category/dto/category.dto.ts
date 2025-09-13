@@ -6,5 +6,9 @@ export class CategoryDto {
 
 	@IsOptional()
 	@IsString()
+	slug?: string
+
+	@IsOptional()
+	@IsString()
 	image?: string
 }

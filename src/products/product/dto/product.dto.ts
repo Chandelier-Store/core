@@ -26,16 +26,16 @@ export class ProductDto {
 	@IsString()
 	name: string
 
+	@IsOptional()
+	@IsString()
+	slug?: string
+
 	@IsString()
 	description: string
 
 	@IsOptional()
 	@IsString()
 	image?: string
-
-	@IsOptional()
-	@IsString()
-	preview?: string
 
 	@IsOptional()
 	@IsString()

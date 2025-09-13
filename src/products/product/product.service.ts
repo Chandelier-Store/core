@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { Prisma, Product } from '@prisma/client'
+import { generateSlug } from 'src/helpers/slug.helper'
 import { PrismaService } from 'src/prisma.service'
 import { StorageService } from 'src/storage/storage.service'
 import { ProductDto } from './dto/product.dto'
@@ -44,27 +45,14 @@ export class ProductService {
 			}
 		}
 	}
-	async create(
-		dto: ProductDto,
-		image?: Express.Multer.File,
-		preview?: Express.Multer.File
-	) {
+	async create(dto: ProductDto, image?: Express.Multer.File) {
 		let imageUrl: string | undefined
-		let previewUrl: string | undefined
 		if (image) {
 			imageUrl = await this.storageService.uploadFile(
 				'images',
 				`products/${Date.now()}-${image.originalname}`,
 				image.buffer,
 				image.mimetype
-			)
-		}
-		if (preview) {
-			previewUrl = await this.storageService.uploadFile(
-				'images',
-				`products/${Date.now()}-${preview.originalname}`,
-				preview.buffer,
-				preview.mimetype
 			)
 		}
 		const categoryId =
@@ -74,9 +62,9 @@ export class ProductService {
 		return this.prisma.product.create({
 			data: {
 				name: dto.name,
+				slug: generateSlug(dto.name),
 				description: dto.description,
 				...(imageUrl ? { image: imageUrl } : {}),
-				...(previewUrl ? { preview: previewUrl } : {}),
 				...(categoryId ? { categoryId } : {}),
 				variants: {
 					create: dto.variants.map(variant => ({
@@ -85,34 +73,20 @@ export class ProductService {
 						inStock: variant.inStock
 					}))
 				}
-			},
+			} as Prisma.ProductCreateInput,
 			include: {
 				variants: true
 			}
 		})
 	}
-	async update(
-		id: string,
-		dto: ProductDto,
-		image?: Express.Multer.File,
-		preview?: Express.Multer.File
-	) {
+	async update(id: string, dto: ProductDto, image?: Express.Multer.File) {
 		let imageUrl: string | undefined
-		let previewUrl: string | undefined
 		if (image) {
 			imageUrl = await this.storageService.uploadFile(
 				'images',
 				`products/${Date.now()}-${image.originalname}`,
 				image.buffer,
 				image.mimetype
-			)
-		}
-		if (preview) {
-			previewUrl = await this.storageService.uploadFile(
-				'images',
-				`products/${Date.now()}-${preview.originalname}`,
-				preview.buffer,
-				preview.mimetype
 			)
 		}
 		await this.prisma.productVariant.deleteMany({
@@ -127,9 +101,9 @@ export class ProductService {
 			where: { id },
 			data: {
 				name: dto.name,
+				slug: generateSlug(dto.name),
 				description: dto.description,
 				...(imageUrl ? { image: imageUrl } : {}),
-				...(previewUrl ? { preview: previewUrl } : {}),
 				...(dto.categoryId ? { categoryId: dto.categoryId } : {}),
 				variants: {
 					create: variantsCreate

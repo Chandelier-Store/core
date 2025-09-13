@@ -8,12 +8,12 @@ import {
 	Post,
 	Put,
 	Query,
-	UploadedFiles,
+	UploadedFile,
 	UseInterceptors,
 	UsePipes,
 	ValidationPipe
 } from '@nestjs/common'
-import { FileFieldsInterceptor } from '@nestjs/platform-express'
+import { FileInterceptor } from '@nestjs/platform-express'
 import { Auth } from 'src/account/auth/decorators/auth.decorator'
 import { ProductDto } from './dto/product.dto'
 import { QueryDto } from './dto/query.dto'
@@ -31,42 +31,26 @@ export class ProductController {
 	@UsePipes(new ValidationPipe())
 	@HttpCode(201)
 	@Auth()
-	@UseInterceptors(
-		FileFieldsInterceptor([
-			{ name: 'image', maxCount: 1 },
-			{ name: 'preview', maxCount: 1 }
-		])
-	)
+	@UseInterceptors(FileInterceptor('image'))
 	@Post()
 	async create(
 		@Body() dto: ProductDto,
-		@UploadedFiles()
-		files: { image?: Express.Multer.File[]; preview?: Express.Multer.File[] }
+		@UploadedFile() image: Express.Multer.File
 	) {
-		const image = files.image?.[0]
-		const preview = files.preview?.[0]
-		return this.productService.create(dto, image, preview)
+		return this.productService.create(dto, image)
 	}
 
 	@Put(':id')
 	@HttpCode(200)
 	@Auth()
-	@UseInterceptors(
-		FileFieldsInterceptor([
-			{ name: 'image', maxCount: 1 },
-			{ name: 'preview', maxCount: 1 }
-		])
-	)
+	@UseInterceptors(FileInterceptor('image'))
 	@UsePipes(new ValidationPipe())
 	async update(
 		@Param('id') id: string,
 		@Body() dto: ProductDto,
-		@UploadedFiles()
-		files: { image?: Express.Multer.File[]; preview?: Express.Multer.File[] }
+		@UploadedFile() image: Express.Multer.File
 	) {
-		const image = files.image?.[0]
-		const preview = files.preview?.[0]
-		return this.productService.update(id, dto, image, preview)
+		return this.productService.update(id, dto, image)
 	}
 
 	@Delete(':id')

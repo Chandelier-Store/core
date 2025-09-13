@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common'
+import { generateSlug } from 'src/helpers/slug.helper'
 import { PrismaService } from 'src/prisma.service'
 import { StorageService } from 'src/storage/storage.service'
 import { CategoryDto } from './dto/category.dto'
@@ -30,6 +31,7 @@ export class CategoryService {
 		return this.prisma.category.create({
 			data: {
 				name: dto.name,
+				slug: generateSlug(dto.name),
 				...(imageUrl ? { image: imageUrl } : {})
 			}
 		})
@@ -48,6 +50,7 @@ export class CategoryService {
 			where: { id },
 			data: {
 				name: dto.name,
+				slug: generateSlug(dto.name),
 				...(imageUrl ? { image: imageUrl } : {})
 			}
 		})
