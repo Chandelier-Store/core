@@ -1,12 +1,12 @@
 import {
 	DeleteObjectCommand,
-	HeadObjectCommand,
 	PutObjectCommand,
 	S3Client
 } from '@aws-sdk/client-s3'
-import { Injectable, NotFoundException } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { getStorageConfig } from 'src/config/storage.config'
+import { v4 as uuidv4 } from 'uuid'
 
 @Injectable()
 export class StorageService {
@@ -18,7 +18,6 @@ export class StorageService {
 		this.s3Client = new S3Client(storageConfig)
 		this.publicUrlBase = storageConfig.publicUrlBase
 	}
-
 	async uploadFile(
 		bucket: string,
 		fileName: string,
@@ -35,30 +34,41 @@ export class StorageService {
 		)
 		return `${process.env.MINIO_API}/${bucket}/${fileName}`
 	}
+	async uploadImageByFolderName(
+		folder: string,
+		image?: Express.Multer.File
+	): Promise<string | undefined> {
+		if (!image) return
+		return this.uploadFile(
+			'images',
+			`${folder}/${uuidv4()}`,
+			image.buffer,
+			image.mimetype
+		)
+	}
 	async deleteFile(bucket: string, fileName: string) {
 		try {
 			await this.s3Client.send(
-				new HeadObjectCommand({
+				new DeleteObjectCommand({
 					Bucket: bucket,
 					Key: fileName
 				})
 			)
 		} catch (error) {
-			if (
-				error.name === 'NotFound' ||
-				error.$metadata?.httpStatusCode === 404
-			) {
-				throw new NotFoundException(
-					`File ${fileName} not found in bucket ${bucket}`
-				)
-			}
-			throw error
+			throw new Error(
+				`Ошибка удаления файла ${fileName} из bucket ${bucket}: ${error}`
+			)
 		}
-		await this.s3Client.send(
-			new DeleteObjectCommand({
-				Bucket: bucket,
-				Key: fileName
-			})
-		)
+	}
+	async deleteFileByUrl(fileUrl: string) {
+		if (!fileUrl) return
+		const base = process.env.MINIO_API + '/'
+		if (!fileUrl.startsWith(base)) return
+		const urlParts = fileUrl.replace(base, '').split('/')
+		const bucket = urlParts.shift()
+		const key = urlParts.join('/')
+		if (bucket && key) {
+			await this.deleteFile(bucket, key)
+		}
 	}
 }

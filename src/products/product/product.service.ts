@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, NotFoundException } from '@nestjs/common'
 import { Prisma, Product } from '@prisma/client'
 import { generateSlug } from 'src/helpers/slug.helper'
 import { PrismaService } from 'src/prisma.service'
@@ -46,15 +46,7 @@ export class ProductService {
 		}
 	}
 	async create(dto: ProductDto, image?: Express.Multer.File) {
-		let imageUrl: string | undefined
-		if (image) {
-			imageUrl = await this.storageService.uploadFile(
-				'images',
-				`products/${Date.now()}-${image.originalname}`,
-				image.buffer,
-				image.mimetype
-			)
-		}
+		const imageUrl = await this.storageService.uploadImageByFolderName('products', image)
 		const categoryId =
 			dto.categoryId && dto.categoryId !== 'undefined'
 				? dto.categoryId
@@ -80,14 +72,15 @@ export class ProductService {
 		})
 	}
 	async update(id: string, dto: ProductDto, image?: Express.Multer.File) {
+		const product = await this.prisma.product.findUnique({ where: { id } })
+		if (!product) throw new NotFoundException(`Product with id ${id} not found`)
+
 		let imageUrl: string | undefined
 		if (image) {
-			imageUrl = await this.storageService.uploadFile(
-				'images',
-				`products/${Date.now()}-${image.originalname}`,
-				image.buffer,
-				image.mimetype
-			)
+			imageUrl = await this.storageService.uploadImageByFolderName('products', image)
+			if (product.image) {
+				await this.storageService.deleteFileByUrl(product.image)
+			}
 		}
 		await this.prisma.productVariant.deleteMany({
 			where: { productId: id }
@@ -116,9 +109,12 @@ export class ProductService {
 		})
 	}
 	async delete(id: string) {
-		return this.prisma.product.delete({
-			where: { id }
-		})
+		const product = await this.prisma.product.findUnique({ where: { id } })
+		if (!product) throw new NotFoundException(`Product with id ${id} not found`)
+		if (product.image) {
+			await this.storageService.deleteFileByUrl(product.image)
+		}
+		return this.prisma.product.delete({ where: { id } })
 	}
 	async getWeekProducts(limit = 5) {
 		const weekStart = new Date()

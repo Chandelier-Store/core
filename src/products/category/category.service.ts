@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, NotFoundException } from '@nestjs/common'
 import { generateSlug } from 'src/helpers/slug.helper'
 import { PrismaService } from 'src/prisma.service'
 import { StorageService } from 'src/storage/storage.service'
@@ -19,15 +19,10 @@ export class CategoryService {
 		}
 	}
 	async create(dto: CategoryDto, image: Express.Multer.File) {
-		let imageUrl: string | undefined
-		if (image) {
-			imageUrl = await this.storageService.uploadFile(
-				'images',
-				`products/${Date.now()}-${image.originalname}`,
-				image.buffer,
-				image.mimetype
-			)
-		}
+		const imageUrl = await this.storageService.uploadImageByFolderName(
+			'products',
+			image
+		)
 		return this.prisma.category.create({
 			data: {
 				name: dto.name,
@@ -37,14 +32,18 @@ export class CategoryService {
 		})
 	}
 	async update(id: string, dto: CategoryDto, image: Express.Multer.File) {
+		const category = await this.prisma.category.findUnique({ where: { id } })
+		if (!category) throw new NotFoundException(`Category with id ${id} not found`)
+
 		let imageUrl: string | undefined
 		if (image) {
-			imageUrl = await this.storageService.uploadFile(
-				'images',
-				`products/${Date.now()}-${image.originalname}`,
-				image.buffer,
-				image.mimetype
+			imageUrl = await this.storageService.uploadImageByFolderName(
+				'products',
+				image
 			)
+			if (category.image) {
+				await this.storageService.deleteFileByUrl(category.image)
+			}
 		}
 		return this.prisma.category.update({
 			where: { id },
@@ -56,6 +55,11 @@ export class CategoryService {
 		})
 	}
 	async delete(id: string) {
+		const category = await this.prisma.category.findUnique({ where: { id } })
+		if (!category) throw new NotFoundException(`Category with id ${id} not found`)
+		if (category.image) {
+			await this.storageService.deleteFileByUrl(category.image)
+		}
 		return this.prisma.category.delete({
 			where: { id }
 		})
