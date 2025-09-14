@@ -25,7 +25,7 @@ export class UserService {
 		})
 	}
 	async create(dto: UserDto, currentUser: { id: string; role: Role }) {
-		this.checkPermission(currentUser)
+		await this.checkPermission(currentUser)
 		const existingUser = await this.prisma.user.findUnique({
 			where: { email: dto.email }
 		})
@@ -47,7 +47,7 @@ export class UserService {
 		dto: UserDto,
 		currentUser: { id: string; role: Role }
 	) {
-		this.checkPermission(currentUser)
+		await this.checkPermission(currentUser)
 		const existingUser = await this.prisma.user.findUnique({
 			where: { email: dto.email }
 		})
@@ -70,7 +70,7 @@ export class UserService {
 		})
 	}
 	async delete(id: string, currentUser: { id: string; role: Role }) {
-		this.checkPermission(currentUser)
+		await this.checkPermission(currentUser)
 		return this.prisma.user.delete({
 			where: { id }
 		})
