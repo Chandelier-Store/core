@@ -45,8 +45,23 @@ export class ProductService {
 			}
 		}
 	}
+	async getBySlug(slug: string) {
+		const product = await this.prisma.product.findUnique({
+			where: { slug },
+			include: {
+				category: true,
+				variants: true 
+			}
+		})
+		if (!product)
+			throw new NotFoundException(`Product with slug ${slug} not found`)
+		return product
+	}
 	async create(dto: ProductDto, image?: Express.Multer.File) {
-		const imageUrl = await this.storageService.uploadImageByFolderName('products', image)
+		const imageUrl = await this.storageService.uploadImageByFolderName(
+			'products',
+			image
+		)
 		const categoryId =
 			dto.categoryId && dto.categoryId !== 'undefined'
 				? dto.categoryId
@@ -77,7 +92,10 @@ export class ProductService {
 
 		let imageUrl: string | undefined
 		if (image) {
-			imageUrl = await this.storageService.uploadImageByFolderName('products', image)
+			imageUrl = await this.storageService.uploadImageByFolderName(
+				'products',
+				image
+			)
 			if (product.image) {
 				await this.storageService.deleteFileByUrl(product.image)
 			}

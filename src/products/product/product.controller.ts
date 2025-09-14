@@ -28,6 +28,12 @@ export class ProductController {
 		return this.productService.getList(query)
 	}
 
+	@Get(':slug')
+	@HttpCode(200)
+	async getBySlug(@Param('slug') slug: string) {
+		return this.productService.getBySlug(slug)
+	}
+
 	@UsePipes(new ValidationPipe())
 	@HttpCode(201)
 	@Auth()
