@@ -19,8 +19,13 @@ export class ProductService {
 					contains: query.search,
 					mode: Prisma.QueryMode.insensitive
 				}
-			})
+			}),
+			...(query.categoryId && { categoryId: query.categoryId })
 		}
+
+		const limit = query.limit ?? 20
+		const page = query.page ?? 1
+		const offset = (page - 1) * limit
 
 		const [items, count] = await this.prisma.$transaction([
 			this.prisma.product.findMany({
@@ -32,8 +37,8 @@ export class ProductService {
 				orderBy: {
 					createdAt: 'desc'
 				},
-				take: query.limit ?? 20,
-				skip: query.offset ?? 0
+				take: limit,
+				skip: offset
 			}),
 			this.prisma.product.count({ where })
 		])
@@ -41,7 +46,10 @@ export class ProductService {
 		return {
 			data: items,
 			meta: {
-				count
+				total: count,
+				limit,
+				page,
+				pageCount: Math.ceil(count / limit)
 			}
 		}
 	}
@@ -50,7 +58,7 @@ export class ProductService {
 			where: { slug },
 			include: {
 				category: true,
-				variants: true 
+				variants: true
 			}
 		})
 		if (!product)

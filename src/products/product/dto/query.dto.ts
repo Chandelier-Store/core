@@ -9,12 +9,16 @@ export class QueryDto {
 	@IsOptional()
 	@Type(() => Number)
 	@IsInt()
-	@Min(0)
-	offset?: number
+	@Min(1)
+	page?: number
 
 	@IsOptional()
 	@Type(() => Number)
 	@IsInt()
 	@Min(1)
 	limit?: number
+
+	@IsOptional()
+	@IsString()
+	categoryId?: string
 }
