@@ -20,5 +20,5 @@ export class QueryDto {
 
 	@IsOptional()
 	@IsString()
-	categoryId?: string
+	category?: string
 }

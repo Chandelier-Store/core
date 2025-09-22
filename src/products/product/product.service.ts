@@ -20,7 +20,11 @@ export class ProductService {
 					mode: Prisma.QueryMode.insensitive
 				}
 			}),
-			...(query.categoryId && { categoryId: query.categoryId })
+			...(query.category && {
+				category: {
+					slug: query.category
+				}
+			})
 		}
 
 		const limit = query.limit ?? 20
