@@ -54,6 +54,7 @@ model Product {
   slug         String?           @unique
   description  String
   image        String            @default("images/default/default_product.jpg") @map("image_url")
+  discount     Float?            @default(0)
 
   categoryId   String?           @map("category_id")
 

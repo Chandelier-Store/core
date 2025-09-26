@@ -7,6 +7,7 @@ export const returnProductObject: Prisma.ProductSelect = {
 	name: true,
 	slug: true,
 	description: true,
+	discount: true,
 	category: {
 		select: {
 			id: true,

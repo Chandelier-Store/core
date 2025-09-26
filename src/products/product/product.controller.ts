@@ -33,6 +33,11 @@ export class ProductController {
 		return this.productService.getWeekProducts()
 	}
 
+	@Get('discounted-products')
+	async getDiscountedProducts() {
+		return this.productService.getDiscountedProducts()
+	}
+
 	@Get(':slug')
 	@HttpCode(200)
 	async getBySlug(@Param('slug') slug: string) {

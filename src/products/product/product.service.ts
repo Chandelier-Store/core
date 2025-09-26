@@ -82,6 +82,7 @@ export class ProductService {
 				name: dto.name,
 				slug: generateSlug(dto.name),
 				description: dto.description,
+				discount: dto.discount,
 				...(imageUrl ? { image: imageUrl } : {}),
 				...(categoryId ? { categoryId } : {}),
 				variants: {
@@ -125,6 +126,7 @@ export class ProductService {
 				name: dto.name,
 				slug: generateSlug(dto.name),
 				description: dto.description,
+				discount: dto.discount,
 				...(imageUrl ? { image: imageUrl } : {}),
 				...(dto.categoryId ? { categoryId: dto.categoryId } : {}),
 				variants: {
@@ -194,4 +196,19 @@ export class ProductService {
 		)
 		return [...existing, ...updated]
 	}
+	async getDiscountedProducts() {
+		const discountedProducts = await this.prisma.product.findMany({
+			where: {
+				discount: { gt: 0 }
+			},
+			include: {	 category: true, variants: true },
+		})
+		return {
+			data: discountedProducts,
+			meta: {
+				total: discountedProducts.length,
+			}
+		}
+	}
 }
+
