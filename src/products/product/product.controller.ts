@@ -28,6 +28,11 @@ export class ProductController {
 		return this.productService.getList(query)
 	}
 
+	@Get('week-products')
+	async getWeekProducts() {
+		return this.productService.getWeekProducts()
+	}
+
 	@Get(':slug')
 	@HttpCode(200)
 	async getBySlug(@Param('slug') slug: string) {
@@ -64,10 +69,5 @@ export class ProductController {
 	@Auth()
 	async delete(@Param('id') id: string) {
 		return this.productService.delete(id)
-	}
-
-	@Get('week-products')
-	async getWeekProducts() {
-		return this.productService.getWeekProducts()
 	}
 }

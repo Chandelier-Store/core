@@ -46,7 +46,6 @@ export class ProductService {
 			}),
 			this.prisma.product.count({ where })
 		])
-
 		return {
 			data: items,
 			meta: {
@@ -155,9 +154,20 @@ export class ProductService {
 			where: { lastPickedAt: { gte: weekStart } },
 			include: { category: true, variants: true }
 		})
-		if (picked.length >= limit) return picked
-		return this.pickNewWeekProducts(picked, limit, weekStart)
+
+		const items =
+			picked.length >= limit
+				? picked
+				: await this.pickNewWeekProducts(picked, limit, weekStart)
+
+		return {
+			data: items,
+			meta: {
+				total: items.length,
+			}
+		}
 	}
+
 	async pickNewWeekProducts(
 		existing: Product[],
 		limit: number,
