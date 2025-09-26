@@ -145,7 +145,7 @@ export class ProductService {
 		}
 		return this.prisma.product.delete({ where: { id } })
 	}
-	async getWeekProducts(limit = 5) {
+	async getWeekProducts(limit = 9) {
 		const weekStart = new Date()
 		weekStart.setHours(0, 0, 0, 0)
 		weekStart.setDate(weekStart.getDate() - weekStart.getDay())
@@ -167,7 +167,6 @@ export class ProductService {
 			}
 		}
 	}
-
 	async pickNewWeekProducts(
 		existing: Product[],
 		limit: number,
